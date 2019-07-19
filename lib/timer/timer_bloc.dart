@@ -27,12 +27,47 @@ class TimerBloc{
 
   Function(int) get changeTimer => _timer.sink.add;
 
-  void saveTimer() async{
-    await timerRepository.saveTimer(_timer.value);
+  void didChangeLifeCycle(AppLifecycleState state){
+    switch (state) {
+      case AppLifecycleState.suspending:
+        print("suspending");
+        saveTimer();
+        break;
+      case AppLifecycleState.inactive:
+        saveTimer();
+        print("inactive");
+        break;
+      case AppLifecycleState.resumed:
+        print("resumed");
+//        saveTimer();
+        break;
+      case AppLifecycleState.paused:
+        print("paused");
+        break;
+    }
+  }
+
+  void saveTimer(){
+    timerRepository.saveTimer(_timer.value);
   }
 
   Future<int> getTimer() async{
-    return await timerRepository.getTimer();
+    try{
+      int timeSaved = await timerRepository.getTimer();
+      if(timeSaved != 0){
+        duration = Duration(seconds: timeSaved);
+        timerCountDown.cancel();
+        startCountDown();
+      }
+      return timeSaved;
+    }catch(e){
+      throw(e);
+    }
+
+  }
+
+  Future<void> clearTimer() async{
+    await timerRepository.clearTime();
   }
 
   void startCountDown() async{

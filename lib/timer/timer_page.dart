@@ -7,12 +7,25 @@ class TimerPage extends StatefulWidget {
   _TimerPageState createState() => _TimerPageState();
 }
 
-class _TimerPageState extends State<TimerPage> {
+class _TimerPageState extends State<TimerPage> with WidgetsBindingObserver {
   TimerBloc bloc;
 
   @override
-  void deactivate() async {
-    super.deactivate();
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    bloc.didChangeLifeCycle(state);
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -60,7 +73,8 @@ class _TimerPageState extends State<TimerPage> {
                 onPressed: () {
                   setState(() {});
                 },
-                child: Text("Reconstruir"))
+                child: Text("Reconstruir")),
+            FlatButton(onPressed: bloc.clearTimer, child: Text("Zerar"))
           ],
         ),
       ),

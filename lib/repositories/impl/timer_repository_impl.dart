@@ -12,10 +12,8 @@ class TimerRepositoryImpl implements TimerRepository{
   @override
   Future<int> getTimer() async{
     try {
-      final file = _localFile;
-
       // Read the file.
-      String contents = await file.readAsString();
+      String contents = await _localFile.readAsString();
 
       return int.parse(contents);
     } catch (e) {
@@ -25,11 +23,14 @@ class TimerRepositoryImpl implements TimerRepository{
   }
 
   @override
-  Future<void> saveTimer(int timer) async{
-    final file = _localFile;
-
+  void saveTimer(int timer){
     // Write the file.
-    return file.writeAsString(timer.toString());
+    _localFile.writeAsString(timer.toString());
+  }
+
+  @override
+  Future<void> clearTime() async{
+    await _localFile.delete();
   }
 
 }
